@@ -18,6 +18,11 @@ yarn install
 
 # bun
 bun install
+
+# ultralytics
+pip install fastapi uvicorn python-multipart pillow ultralytics
+
+
 ```
 
 ## Development Server
