@@ -78,6 +78,7 @@ bun run preview
 ```
 #error
 Remove-Item -Recurse -Force .nuxt, node_modules, pnpm-lock.yaml
+#
 pnmp init
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
