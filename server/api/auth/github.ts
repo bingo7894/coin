@@ -4,23 +4,26 @@ import { sanitizeUser } from "~/server/utils/auth";
 export default defineOAuthGitHubEventHandler({
   config: {
     emailRequired: true,
-    scope: ["read:user", "user:email"], // ขอสิทธิ์ดึงข้อมูลโปรไฟล์และอีเมล
+    scope: ["read:user", "user:email"],
   },
   async onSuccess(event, { user }) {
-    // แสดงข้อมูล raw จาก GitHub ชัดเจน
     console.log("Full GitHub user object:", JSON.stringify(user, null, 2));
 
-    // กำหนด fallback สำหรับ name และ avatar_url
     const githubName = user.name ?? user.login ?? "No Name";
     const githubAvatarUrl = user.avatar_url ?? "";
 
-    // หา user ใน DB ตาม email
+    const githubEmail = user.email ?? undefined;
+
+    if (!githubEmail) {
+      console.error("GitHub user has no email");
+      return sendRedirect(event, "/error");
+    }
+
     let currentUser = await db.user.findUnique({
-      where: { email: user.email },
+      where: { email: githubEmail },
     });
 
     if (currentUser) {
-      // ถ้าพบ user แล้ว เช็คว่า name หรือ avatarUrl ยังว่างหรือ null ไหม ถ้าว่างก็อัปเดต
       const updateData: any = {};
       if (!currentUser.name) updateData.name = githubName;
       if (!currentUser.avatarUrl) updateData.avatarUrl = githubAvatarUrl;
@@ -32,17 +35,15 @@ export default defineOAuthGitHubEventHandler({
         });
       }
     } else {
-      // ถ้าไม่มี user ให้สร้างใหม่พร้อมข้อมูล fallback
       currentUser = await db.user.create({
         data: {
-          email: user.email,
+          email: githubEmail,
           name: githubName,
           avatarUrl: githubAvatarUrl,
         },
       });
     }
 
-    // ตรวจสอบบัญชี OAuth ว่ามีใน DB หรือยัง
     const oAuthAccount = await db.oauthAccount.findFirst({
       where: { userId: currentUser.id },
     });
@@ -57,14 +58,12 @@ export default defineOAuthGitHubEventHandler({
       });
     }
 
-    // sanitize user ก่อนเซ็ต session
     const transformedUser = sanitizeUser(currentUser);
 
     if (transformedUser) {
       await setUserSession(event, { user: transformedUser });
     }
 
-    // redirect หลังล็อกอินสำเร็จ
     return sendRedirect(event, "/");
   },
   onError(event, error) {
