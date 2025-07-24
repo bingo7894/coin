@@ -3,27 +3,7 @@
     class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col"
   >
     <!-- Header -->
-    <header
-      class="flex items-center justify-between p-4 bg-white shadow-lg backdrop-blur-sm bg-white/95"
-    >
-      <div class="flex items-center space-x-3">
-        <div class="relative">
-          <div
-            class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg"
-          >
-            <Icon name="lucide:calculator" class="w-4 h-4 text-white" />
-          </div>
-          <div
-            class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"
-          ></div>
-        </div>
-        <span
-          class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-        >
-          Mr.Count
-        </span>
-      </div>
-    </header>
+    <CoinHeadBar />
 
     <main class="flex-1 p-6">
       <!-- จำกัดความกว้างและจัดกลาง -->
@@ -137,12 +117,23 @@
           </div>
         </section>
 
-        <!-- แสดงภาพที่ label แล้ว -->
-        <div class="mt-6">
-          <h3 class="font-semibold text-gray-800 mb-4">ภาพที่มีการตรวจจับ:</h3>
-          <img :src="result?.labeledImage" alt="Labeled Image" />
-        </div>
-        <p>labeledImage = {{ result?.labeledImage }}</p>
+        <!-- แสดงภาพที่ label แล้ว - แสดงเฉพาะเมื่อมีผลลัพธ์และมี labeledImage -->
+        <section
+          v-if="result && result.labeledImage"
+          class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100"
+        >
+          <div class="flex items-center space-x-2 mb-4">
+            <Icon name="lucide:scan" class="w-5 h-5 text-blue-600" />
+            <h3 class="font-semibold text-gray-800">ภาพที่มีการตรวจจับ</h3>
+          </div>
+          <div class="rounded-xl overflow-hidden">
+            <img
+              :src="result.labeledImage"
+              alt="Labeled Image"
+              class="w-full h-auto object-contain"
+            />
+          </div>
+        </section>
 
         <!-- Section: ผลลัพธ์ -->
         <section
@@ -281,44 +272,7 @@
         </section>
 
         <!-- Tips Section -->
-        <section
-          class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-2xl shadow-xl border border-yellow-200"
-        >
-          <div class="flex items-center space-x-2 mb-4">
-            <Icon name="lucide:lightbulb" class="w-5 h-5 text-yellow-600" />
-            <h2 class="font-semibold text-yellow-800">เคล็ดลับการถ่ายภาพ</h2>
-          </div>
-          <ul class="space-y-2 text-sm text-yellow-700">
-            <li class="flex items-start space-x-2">
-              <Icon
-                name="lucide:check"
-                class="w-4 h-4 mt-0.5 text-yellow-600"
-              />
-              <span>วางเหรียญบนพื้นผิวเรียบ สีขาวหรือสีอ่อน</span>
-            </li>
-            <li class="flex items-start space-x-2">
-              <Icon
-                name="lucide:check"
-                class="w-4 h-4 mt-0.5 text-yellow-600"
-              />
-              <span>ใช้แสงธรรมชาติหรือแสงที่เพียงพอ</span>
-            </li>
-            <li class="flex items-start space-x-2">
-              <Icon
-                name="lucide:check"
-                class="w-4 h-4 mt-0.5 text-yellow-600"
-              />
-              <span>ถ่ายจากด้านบนในระยะใกล้พอสมควร</span>
-            </li>
-            <li class="flex items-start space-x-2">
-              <Icon
-                name="lucide:check"
-                class="w-4 h-4 mt-0.5 text-yellow-600"
-              />
-              <span>หลีกเลี่ยงเงาและแสงสะท้อน</span>
-            </li>
-          </ul>
-        </section>
+        <CoinTipsSection />
         <!-- Additional Features Section -->
         <div class="p-6 rounded-2xl shadow-xl border border-gray-100"></div>
       </div>
@@ -331,6 +285,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+const router = useRouter();
 
 // Types
 interface CoinDetail {
@@ -391,6 +346,7 @@ const processImage = async () => {
     const formData = new FormData();
     formData.append("file", selectedFile.value);
 
+    // 1. เรียก API ของ Python เพื่อประมวลผลภาพ
     const res = await fetch("http://localhost:8000/api/process-image", {
       method: "POST",
       body: formData,
@@ -398,8 +354,23 @@ const processImage = async () => {
 
     if (!res.ok) throw new Error("Error processing image");
 
-    const data = await res.json();
-    result.value = data as ProcessResult; // รับผลลัพธ์มาเก็บใน result
+    const data: ProcessResult = await res.json();
+    result.value = data;
+
+    // 2. <<-- เพิ่มส่วนนี้ -->>
+    // หลังจากประมวลผลสำเร็จ ให้บันทึกผลลัพธ์ลง DB ผ่าน Nuxt Server API
+    try {
+      const savedHistory = await $fetch("/api/history", {
+        method: "POST",
+        body: data, // ส่งผลลัพธ์ทั้งหมดไปบันทึก
+      });
+      console.log("History saved:", savedHistory);
+      // อาจจะดีกว่าถ้าไปที่หน้ารายละเอียดเลย
+      // router.push(`/history/${savedHistory.id}`);
+    } catch (saveError) {
+      console.error("Failed to save history:", saveError);
+      // อาจจะแสดงข้อความแจ้งเตือนผู้ใช้ว่าบันทึกไม่สำเร็จ
+    }
   } catch (e) {
     console.error("processImage error:", e);
   } finally {

@@ -1,5 +1,6 @@
 <!-- pages/coin.vue -->
 <template>
+  <CoinHeadBar />
   <div>tag</div>
 
   <CoinNavButton />

@@ -9,9 +9,13 @@ import random
 
 app = FastAPI()
 
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # สำหรับทดสอบ ใช้ "*" ได้
+    allow_origins=["http://192.168.1.47:3000", "http://localhost:3000"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

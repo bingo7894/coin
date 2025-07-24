@@ -38,6 +38,39 @@ export default () => {
     });
   };
 
+  // เพิ่มฟังก์ชัน fetchApi
+  const baseUrl = process.env.NUXT_PUBLIC_API_BASE_URL;
+
+  async function fetchApi(endpoint: string, options?: RequestInit) {
+    toggleLoading(true);
+    toggleError(null);
+
+    try {
+      const res = await fetch(`${baseUrl}${endpoint}`, options);
+      if (!res.ok) {
+        const errorBody = await res.json();
+        const apiError: APIError = {
+          statusCode: res.status,
+          message: errorBody.message || res.statusText,
+          statusMessage: res.statusText,
+        };
+        toggleError(apiError);
+        showError(apiError);
+        throw new Error(apiError.message);
+      }
+      const data = await res.json();
+      toggleLoading(false);
+      return data;
+    } catch (error) {
+      toggleLoading(false);
+      showError({
+        statusCode: 0,
+        message: (error as Error).message,
+        statusMessage: "Network error",
+      });
+      throw error;
+    }
+  }
   return {
     isLoading,
     appError,
@@ -47,5 +80,6 @@ export default () => {
     toggleAlertModal,
     toggleError,
     showMessage,
+    fetchApi,
   };
 };

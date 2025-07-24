@@ -31,13 +31,27 @@ const { isLoading, toggleLoading, showMessage, showError } = useStore();
 async function login(event: FormSubmitEvent<LoginSchema>) {
   try {
     toggleLoading(true);
-    await $fetch("/api/auth/login", {
+
+    const response = await $fetch("/api/auth/login", {
       method: "POST",
       body: event.data,
     });
-    await navigateTo("/");
+
+    console.log("Login response:", response); // Debug log
+
+    // Show success message
+    showMessage({
+      title: "เข้าสู่ระบบสำเร็จ",
+      description: "กำลังนำคุณไปยังหน้าหลัก...",
+    });
+
+    // Wait a bit for the message to show
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Navigate to home page
+    await navigateTo("/", { replace: true });
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error);
     const err = handleError(error);
     showError(err);
   } finally {
@@ -48,11 +62,27 @@ async function login(event: FormSubmitEvent<LoginSchema>) {
 async function register(event: FormSubmitEvent<RegisterSchema>) {
   try {
     toggleLoading(true);
-    await $fetch("/api/auth/register", {
+
+    const response = await $fetch("/api/auth/register", {
       method: "POST",
       body: event.data,
     });
+
+    console.log("Register response:", response); // Debug log
+
+    // Show success message
+    showMessage({
+      title: "สมัครสมาชิกสำเร็จ",
+      description: "บัญชีของคุณถูกสร้างเรียบร้อยและได้เข้าสู่ระบบแล้ว",
+    });
+
+    // Wait a bit for the message to show
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Navigate to home page
+    await navigateTo("/", { replace: true });
   } catch (error: any) {
+    console.error("Register error:", error);
     const err = handleError(error);
     showError(err);
   } finally {
@@ -87,18 +117,36 @@ definePageMeta({
           :state="loginForm"
         >
           <UFormGroup label="Email" name="email">
-            <UInput v-model="loginForm.email" type="email" />
+            <UInput
+              v-model="loginForm.email"
+              type="email"
+              placeholder="กรอกอีเมลของคุณ"
+              :disabled="isLoading"
+            />
           </UFormGroup>
           <UFormGroup label="Password" name="password">
-            <UInput v-model="loginForm.password" type="password" />
+            <UInput
+              v-model="loginForm.password"
+              type="password"
+              placeholder="กรอกรหัสผ่าน"
+              :disabled="isLoading"
+            />
           </UFormGroup>
           <div class="space-y-5 mt-5">
-            <UButton block type="submit" :disabled="isLoading">Login</UButton>
-            <AuthButton></AuthButton>
+            <UButton
+              block
+              type="submit"
+              :loading="isLoading"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ" }}
+            </UButton>
+            <AuthButton :disabled="isLoading"></AuthButton>
           </div>
         </UForm>
       </UCard>
     </template>
+
     <template #register="{ item }">
       <UCard>
         <template #header>
@@ -119,19 +167,40 @@ definePageMeta({
           :state="registerForm"
         >
           <UFormGroup label="Name" name="name">
-            <UInput v-model="registerForm.name" />
+            <UInput
+              v-model="registerForm.name"
+              placeholder="กรอกชื่อของคุณ"
+              :disabled="isLoading"
+            />
           </UFormGroup>
 
           <UFormGroup label="Email" name="email">
-            <UInput v-model="registerForm.email" type="email" />
+            <UInput
+              v-model="registerForm.email"
+              type="email"
+              placeholder="กรอกอีเมลของคุณ"
+              :disabled="isLoading"
+            />
           </UFormGroup>
 
           <UFormGroup label="Password" name="password">
-            <UInput v-model="registerForm.password" type="password" />
+            <UInput
+              v-model="registerForm.password"
+              type="password"
+              placeholder="กรอกรหัสผ่าน"
+              :disabled="isLoading"
+            />
           </UFormGroup>
           <div class="space-y-5 mt-5">
-            <UButton block type="submit">Register</UButton>
-            <AuthButton></AuthButton>
+            <UButton
+              block
+              type="submit"
+              :loading="isLoading"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก" }}
+            </UButton>
+            <AuthButton :disabled="isLoading"></AuthButton>
           </div>
         </UForm>
       </UCard>
