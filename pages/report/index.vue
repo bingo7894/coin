@@ -194,7 +194,7 @@
 </template>
 
 <script setup lang="ts">
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 definePageMeta({
   middleware: "protected",
