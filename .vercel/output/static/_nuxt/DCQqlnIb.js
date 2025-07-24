@@ -1,2 +1,0 @@
-import{h as _,a3 as i,c as l,a as c,b as a,t as d,a1 as p,w as o,Y as m,o as f,d as n,a2 as x}from"./BYeEcd1H.js";const C=_({__name:"index",setup(g){const{user:s,clear:r}=i(),u=async()=>{await r(),await x("/auth")};return(w,t)=>{const e=m;return f(),l("div",null,[c("pre",null,"      "+d(p(s))+`
-    `,1),a(e,{onClick:u},{default:o(()=>t[0]||(t[0]=[n("Logout")])),_:1,__:[0]}),a(e,{to:"/coin"},{default:o(()=>t[1]||(t[1]=[n("Coin Mode")])),_:1,__:[1]})])}}});export{C as default};

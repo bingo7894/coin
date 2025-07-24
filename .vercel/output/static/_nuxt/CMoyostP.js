@@ -1,1 +1,0 @@
-import{_ as t,c as s,o,j as c}from"./BYeEcd1H.js";const r={},n={class:"min-h-screen overflow-y-auto flex justify-center items-center"};function a(e,f){return o(),s("div",n,[c(e.$slots,"default")])}const _=t(r,[["render",a]]);export{_ as default};

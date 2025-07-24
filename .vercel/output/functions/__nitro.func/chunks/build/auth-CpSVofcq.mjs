@@ -1,0 +1,45 @@
+import { mergeProps, useSSRContext } from 'vue';
+import { ssrRenderAttrs, ssrRenderSlot } from 'vue/server-renderer';
+import { _ as _export_sfc } from './server.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:zlib';
+import 'node:stream';
+import 'node:buffer';
+import 'node:util';
+import 'node:url';
+import 'node:net';
+import 'node:fs';
+import 'node:path';
+import '../_/nitro.mjs';
+import '@adonisjs/hash';
+import '@adonisjs/hash/drivers/scrypt';
+import 'node:crypto';
+import 'node:events';
+import '@iconify/utils';
+import 'consola';
+import 'vue-router';
+import '@vueuse/core';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import 'unhead/plugins';
+
+const _sfc_main = {};
+function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
+  _push(`<div${ssrRenderAttrs(mergeProps({ class: "min-h-screen overflow-y-auto flex justify-center items-center" }, _attrs))}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</div>`);
+}
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("layouts/auth.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+const auth = /* @__PURE__ */ _export_sfc(_sfc_main, [["ssrRender", _sfc_ssrRender]]);
+
+export { auth as default };
+//# sourceMappingURL=auth-CpSVofcq.mjs.map
