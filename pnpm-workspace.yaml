@@ -1,0 +1,10 @@
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - core-js
+  - esbuild
+  - vue-demi
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma

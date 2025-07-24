@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "nuxt dev",
-  "build": "prisma generate && nuxt build",
+    "build": "prisma generate && nuxt build",
     "preview": "nuxt preview",
     "generate": "nuxt generate",
     "postinstall": "nuxt prepare"
@@ -25,7 +25,8 @@
     "vue-router": "latest",
     "vue3-chart-v2": "^0.8.3",
     "vuedraggable": "^2.24.3",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@adonisjs/hash": "^9.1.1"
   },
   "devDependencies": {
     "@iconify-json/flat-color-icons": "^1.2.0",
