@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
@@ -10,7 +9,13 @@ export default defineNuxtConfig({
     "nuxt-tiptap-editor",
   ],
   runtimeConfig: {
-    githubId: "",
-    githubSecret: "",
+    githubId: process.env.NUXT_GITHUB_CLIENT_ID || "",
+    githubSecret: process.env.NUXT_GITHUB_CLIENT_SECRET || "",
+    public: {
+      githubId: process.env.NUXT_GITHUB_CLIENT_ID || "",
+    },
+  },
+  nitro: {
+    preset: "vercel",
   },
 });
