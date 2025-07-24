@@ -1,11 +1,6 @@
-// server/utils/db.ts
-import { PrismaClient } from "@prisma/client";
+import pkg from "@prisma/client";
+const { PrismaClient } = pkg;
 
-// ป้องกันการ new PrismaClient() ซ้ำซ้อนในระหว่าง hot-reloading (development)
-const prisma = globalThis.prisma || new PrismaClient();
+const db = new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.prisma = prisma;
-}
-
-export default prisma;
+export default db;
